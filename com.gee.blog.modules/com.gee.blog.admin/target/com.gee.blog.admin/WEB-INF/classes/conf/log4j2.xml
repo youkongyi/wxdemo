@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="OFF" monitorInterval="1800">
+    <properties>
+        <property name="LOG_HOME">${web:rootDir}/WEB-INF/logs</property>
+        <property name="FILE_NAME">debug</property>
+    </properties>
+
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </Console>
+		<!-- DEBUG级别日志 设置日志格式并配置日志压缩格式，压缩文件独立放在一个文件夹内， 日期格式不能为冒号，
+				否则无法生成，因为文件名不允许有冒号，此appender只输出debug级别的数据到debug.log; -->
+        <RollingFile name="running-log" fileName="${LOG_HOME}/${FILE_NAME}.log"
+            filePattern="${LOG_HOME}/$${date:yyyy-MM}/${FILE_NAME}-%d{yyyy-MM-dd}-%i.log.gz"
+            immediateFlush="true">
+            <PatternLayout
+                pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread][%file:%line] - %msg%n" />
+            <Policies>
+            	<!-- 每天生成一个日志文件 --> 
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <!-- 每到10M生成一个日志文件 --> 
+                <SizeBasedTriggeringPolicy size="10 MB" />
+            </Policies>
+            <!-- 最大保存文件数 -->
+            <DefaultRolloverStrategy max="20" />
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+
+		<!-- 配置日志的根节点 -->
+		<!-- 定义logger，只有定义了logger并引入了appender，appender才会生效 -->
+        <Root level="info">
+            <!-- 这里是输入到文件，很重要-->
+            <AppenderRef ref="running-log" />
+            <!-- 这里是输入到控制台-->
+<!--             <AppenderRef ref="Console" /> -->
+        </Root>
+    </Loggers>
+</Configuration>
